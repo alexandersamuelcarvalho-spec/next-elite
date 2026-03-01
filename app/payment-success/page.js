@@ -1,9 +1,9 @@
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import PageLayout from '../../components/PageLayout';
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const league = searchParams.get('league');
@@ -31,5 +31,13 @@ export default function PaymentSuccessPage() {
         </button>
       </div>
     </PageLayout>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }

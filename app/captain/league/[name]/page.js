@@ -1,9 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import PageLayout from '../../../components/PageLayout';
-import LeagueTable from '../../../components/LeagueTable';
-import { HamburgerIcon } from '../../../components/UIComponents';
+import PageLayout from '../../../../components/PageLayout';
+import LeagueTable from '../../../../components/LeagueTable';
+import { HamburgerIcon } from '../../../../components/UIComponents';
 
 export default function CaptainLeaguePage() {
   const router = useRouter();

@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import PageLayout from '../../../components/PageLayout';
-import { HamburgerIcon } from '../../../components/UIComponents';
+import PageLayout from '../../../../components/PageLayout';
+import { HamburgerIcon } from '../../../../components/UIComponents';
 
 export default function CaptainTeamPage() {
   const router = useRouter();

@@ -1,0 +1,296 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #000000;
+  --white: #ffffff;
+  --black: #000000;
+  --btn-bg: #1a1a1a;
+  --paid: #22c55e;
+  --unpaid: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--bg);
+  color: var(--white);
+  font-family: 'Copperplate', 'Copperplate Gothic Light', 'Cinzel', serif;
+  text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ---- BUTTON STYLES ---- */
+
+/* White button (default) */
+.btn-white {
+  background: #ffffff;
+  color: #000000;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  font-family: 'Copperplate', 'Copperplate Gothic Light', 'Cinzel', serif;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+.btn-white:active {
+  background: transparent;
+  color: #ffffff;
+}
+
+/* Black button */
+.btn-black {
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 999px;
+  font-family: 'Copperplate', 'Copperplate Gothic Light', 'Cinzel', serif;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+.btn-black:active {
+  background: transparent;
+  color: #000000;
+}
+
+/* Outline black button */
+.btn-outline {
+  background: transparent;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  font-family: 'Copperplate', 'Copperplate Gothic Light', 'Cinzel', serif;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+.btn-outline:active {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* Title box */
+.title-box {
+  background: #ffffff;
+  color: #000000;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Copperplate', 'Copperplate Gothic Light', 'Cinzel', serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Info box */
+.info-box {
+  background: #ffffff;
+  color: #000000;
+  border-radius: 16px;
+  font-family: 'Copperplate', 'Copperplate Gothic Light', 'Cinzel', serif;
+  letter-spacing: 0.03em;
+}
+
+/* Match card */
+.match-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+/* Scrollable select (hamburger buttons) */
+.scroll-select {
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  font-family: 'Copperplate', 'Copperplate Gothic Light', 'Cinzel', serif;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* Payment dot */
+.dot-paid {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--paid);
+  flex-shrink: 0;
+}
+.dot-unpaid {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--unpaid);
+  flex-shrink: 0;
+}
+
+/* Page container */
+.page-container {
+  min-height: 100vh;
+  background-color: var(--bg);
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 20px 40px;
+}
+
+/* Header */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  margin-bottom: 8px;
+}
+
+/* League Table */
+.league-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  color: #000000;
+}
+.league-table th {
+  font-weight: 700;
+  padding: 4px 2px;
+  text-align: center;
+  border-bottom: 3px solid #000;
+}
+.league-table th:first-child {
+  text-align: left;
+  padding-left: 4px;
+  border-right: 3px solid #000;
+}
+.league-table td {
+  padding: 4px 2px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+}
+.league-table td:first-child {
+  text-align: left;
+  padding-left: 4px;
+  border-right: 3px solid #000;
+  background: #e8e8e8;
+  font-weight: 600;
+}
+.league-table tr:nth-child(even) td:not(:first-child) {
+  background: #e8e8e8;
+}
+
+/* Bracket styles */
+.bracket-box {
+  background: #ffffff;
+  border-radius: 4px;
+  border: 2px solid #000;
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  font-weight: 700;
+  font-size: 13px;
+  min-width: 120px;
+  height: 36px;
+}
+
+.bracket-num {
+  background: #000;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 16px;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.bracket-center {
+  background: #000;
+  color: #fff;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 12px;
+  min-width: 100px;
+  height: 32px;
+}
+
+.bracket-line {
+  border-color: #fff;
+}
+
+/* Hamburger icon */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.hamburger span {
+  display: block;
+  width: 18px;
+  height: 2.5px;
+  background: currentColor;
+  border-radius: 2px;
+}
+
+/* Arrow button */
+.arrow-btn {
+  background: transparent;
+  color: #ffffff;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+/* Logo button in header */
+.logo-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Truncate text in buttons */
+.truncate-btn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}

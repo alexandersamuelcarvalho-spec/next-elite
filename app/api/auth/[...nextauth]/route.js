@@ -15,26 +15,26 @@ const handler = NextAuth({
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      // After sign in, check if account exists in Google Sheet, if not create it
       try {
         const { createAccount, getAllAccounts } = await import('../../../../lib/sheets');
         const accounts = await getAllAccounts();
-        const accountName = user.email?.substring(0, 8) || user.name?.substring(0, 8) || 'unknown';
-        const existing = accounts.find(a => a.login === user.email || a.login === user.name);
-        
+        const login = user.email || user.name;
+        const existing = accounts.find(a => a.login === login);
+
         if (!existing) {
           await createAccount({
-            name: accountName,
+            name: user.name || login,
             phone: '',
             loginType: account.provider === 'google' ? 'G' : 'FB',
-            login: user.email || user.name,
+            login,
             status: 'user',
+            teams: [],
           });
         }
         return true;
       } catch (err) {
-        console.error('Error checking/creating account:', err);
-        return true; // Still allow sign in even if sheet fails
+        console.error('Error checking/creating account in Google Sheets:', err.message);
+        return true;
       }
     },
     async session({ session, token }) {

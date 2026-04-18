@@ -72,6 +72,8 @@ export async function POST(request) {
       await sheets.updateLeague(body.data.leagueName, body.data.updates);
     } else if (action === 'updateAccountStatus') {
       await sheets.updateAccountStatus(body.data.accountName, body.data.status);
+    } else if (action === 'updateAccountTeams') {
+      await sheets.updateAccountTeams(body.data.login, body.data.teams);
     } else if (action === 'setBracketWinner') {
       await sheets.setBracketWinner(body.data.leagueName, body.data.box, body.data.winner, body.data.isChampion);
     } else if (action === 'updateTeam') {

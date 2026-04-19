@@ -1,50 +1,47 @@
 import { NextResponse } from 'next/server';
-import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 
 export async function GET() {
-  const results = {};
+  const raw = process.env.GOOGLE_PRIVATE_KEY || '';
+  const replaced = raw.replace(/\\n/g, '\n');
 
+  const results = {
+    rawLength: raw.length,
+    rawFirst50: raw.substring(0, 50),
+    rawLast30: raw.substring(raw.length - 30),
+    hasLiteralBackslashN: raw.includes('\\n'),
+    hasRealNewlines: raw.includes('\n'),
+    hasBeginHeader: raw.includes('BEGIN PRIVATE KEY'),
+    hasEndFooter: raw.includes('END PRIVATE KEY'),
+    replacedLength: replaced.length,
+  };
+
+  // Try with raw key
   try {
-    const auth = new JWT({
+    const auth1 = new JWT({
       email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      key: raw,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
-
-    // Step 1: try getting an access token
-    try {
-      const token = await auth.getAccessToken();
-      results.tokenObtained = !!token?.token;
-    } catch (err) {
-      results.tokenError = err.message;
-      return NextResponse.json(results);
-    }
-
-    // Step 2: try loading the spreadsheet
-    const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEETS_ID, auth);
-    try {
-      await doc.loadInfo();
-      results.docLoaded = true;
-      results.docTitle = doc.title;
-      results.sheetCount = doc.sheetCount;
-    } catch (err) {
-      results.docError = err.message;
-      results.docErrorFull = JSON.stringify(err, Object.getOwnPropertyNames(err));
-      return NextResponse.json(results);
-    }
-
-    // Step 3: try reading accounts
-    try {
-      const sheet = doc.sheetsByIndex[0];
-      const rows = await sheet.getRows();
-      results.rowCount = rows.length;
-    } catch (err) {
-      results.readError = err.message;
-    }
-
+    await auth1.getAccessToken();
+    results.rawKeyWorks = true;
   } catch (err) {
-    results.unexpectedError = err.message;
+    results.rawKeyWorks = false;
+    results.rawKeyError = err.message;
+  }
+
+  // Try with replaced key
+  try {
+    const auth2 = new JWT({
+      email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      key: replaced,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    await auth2.getAccessToken();
+    results.replacedKeyWorks = true;
+  } catch (err) {
+    results.replacedKeyWorks = false;
+    results.replacedKeyError = err.message;
   }
 
   return NextResponse.json(results);

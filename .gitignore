@@ -28,6 +28,11 @@ yarn-error.log*
 .cache
 .parcel-cache
 
+# Claude Code
+.agents/
+.claude/
+skills-lock.json
+
 # Embedded repos (not part of this project)
 Next Elite Website/
 Next-Elite-Website/

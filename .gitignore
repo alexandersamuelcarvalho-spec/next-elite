@@ -31,3 +31,5 @@ yarn-error.log*
 # Embedded repos (not part of this project)
 Next Elite Website/
 Next-Elite-Website/
+ Next-Elite-Website/
+.vercel

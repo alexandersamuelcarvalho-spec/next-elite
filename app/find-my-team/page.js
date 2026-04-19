@@ -14,9 +14,9 @@ export default function FindMyTeamPage() {
   const [selectedTeam, setSelectedTeam] = useState('');
 
   useEffect(() => {
-    fetch('/api/sheets?type=locations').then(r => r.json()).then(setLocations).catch(() => setLocations(['CROSSBAR DENTON', 'CROSSBAR FORT WORTH']));
-    fetch('/api/sheets?type=leagues').then(r => r.json()).then(setLeagues).catch(() => setLeagues([]));
-    fetch('/api/sheets?type=teams').then(r => r.json()).then(setTeams).catch(() => setTeams([]));
+    fetch('/api/sheets?type=locations').then(r => r.json()).then(d => setLocations(Array.isArray(d) ? d : [])).catch(() => setLocations([]));
+    fetch('/api/sheets?type=leagues').then(r => r.json()).then(d => setLeagues(Array.isArray(d) ? d : [])).catch(() => setLeagues([]));
+    fetch('/api/sheets?type=teams').then(r => r.json()).then(d => setTeams(Array.isArray(d) ? d : [])).catch(() => setTeams([]));
   }, []);
 
   const filteredLeagues = leagues.filter(l => !selectedLocation || l.location === selectedLocation);

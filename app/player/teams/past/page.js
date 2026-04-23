@@ -1,18 +1,31 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import PageLayout from '../../../../components/PageLayout';
 
 export default function PlayerPastPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [pastTeams, setPastTeams] = useState([]);
 
   useEffect(() => {
-    fetch('/api/sheets?type=teams').then(r => r.json()).then(teams => {
-      // In production, filter by userAccount and only show teams in past leagues
-      setPastTeams(teams.slice(0, 2));
+    Promise.all([
+      fetch('/api/sheets?type=teams').then(r => r.json()),
+      fetch('/api/sheets?type=leagues').then(r => r.json()),
+    ]).then(([allTeams, allLeagues]) => {
+      const ongoingLeagueNames = new Set(
+        allLeagues.filter(l => l.status === 'On Going').map(l => l.name)
+      );
+      const playerTeamNames = (session?.user?.teams || [])
+        .filter(t => t.role?.toLowerCase() === 'player')
+        .map(t => t.team);
+      setPastTeams(allTeams.filter(t =>
+        playerTeamNames.includes(t.name) &&
+        (t.leagues || []).every(l => !ongoingLeagueNames.has(l))
+      ));
     }).catch(() => {});
-  }, []);
+  }, [session]);
 
   return (
     <PageLayout>

@@ -1,21 +1,23 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useApp } from '../../../context/AppContext';
+import { useSession } from 'next-auth/react';
 import PageLayout from '../../../components/PageLayout';
-import { HamburgerIcon } from '../../../components/UIComponents';
 
 export default function CaptainTeamsPage() {
   const router = useRouter();
-  const { userAccount } = useApp();
+  const { data: session } = useSession();
   const [myTeams, setMyTeams] = useState([]);
 
   useEffect(() => {
-    fetch('/api/sheets?type=teams').then(r => r.json()).then(teams => {
-      // In production, filter teams where user is captain
-      setMyTeams(teams.slice(0, 3));
+    fetch('/api/sheets?type=teams').then(r => r.json()).then(allTeams => {
+      // Get the teams this account is a captain of from the session
+      const captainTeamNames = (session?.user?.teams || [])
+        .filter(t => t.role?.toLowerCase() === 'captain')
+        .map(t => t.team);
+      setMyTeams(allTeams.filter(t => captainTeamNames.includes(t.name)));
     }).catch(() => {});
-  }, []);
+  }, [session]);
 
   return (
     <PageLayout>

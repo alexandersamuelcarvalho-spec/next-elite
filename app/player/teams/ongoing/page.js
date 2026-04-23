@@ -1,21 +1,31 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useApp } from '../../../../context/AppContext';
+import { useSession } from 'next-auth/react';
 import PageLayout from '../../../../components/PageLayout';
 
 export default function PlayerOngoingPage() {
   const router = useRouter();
-  const { userAccount } = useApp();
+  const { data: session } = useSession();
   const [myTeams, setMyTeams] = useState([]);
 
   useEffect(() => {
-    fetch('/api/sheets?type=teams').then(r => r.json()).then(teams => {
-      // Filter teams the logged-in player is on (role = player) with ongoing leagues
-      // In production, filter by userAccount.teams
-      setMyTeams(teams.filter(t => t.leagues?.length > 0).slice(0, 4));
+    Promise.all([
+      fetch('/api/sheets?type=teams').then(r => r.json()),
+      fetch('/api/sheets?type=leagues').then(r => r.json()),
+    ]).then(([allTeams, allLeagues]) => {
+      const ongoingLeagueNames = new Set(
+        allLeagues.filter(l => l.status === 'On Going').map(l => l.name)
+      );
+      const playerTeamNames = (session?.user?.teams || [])
+        .filter(t => t.role?.toLowerCase() === 'player')
+        .map(t => t.team);
+      setMyTeams(allTeams.filter(t =>
+        playerTeamNames.includes(t.name) &&
+        (t.leagues || []).some(l => ongoingLeagueNames.has(l))
+      ));
     }).catch(() => {});
-  }, []);
+  }, [session]);
 
   const btnStyle = (label) => ({
     width: '100%',

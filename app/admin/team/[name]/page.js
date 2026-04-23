@@ -20,12 +20,19 @@ export default function AdminTeamDetailPage() {
   const [switcherSearch, setSwitcherSearch] = useState('');
   const switcherRef = useRef(null);
 
+  const [accounts, setAccounts] = useState([]);
+  const [showCaptainPicker, setShowCaptainPicker] = useState(false);
+  const [captainSearch, setCaptainSearch] = useState('');
+  const [captainSaving, setCaptainSaving] = useState(false);
+  const captainRef = useRef(null);
+
   useEffect(() => {
     fetch('/api/sheets?type=teams').then(r => r.json()).then(teams => {
       setAllTeams(teams);
       setTeam(teams.find(t => t.name === teamName));
     }).catch(() => {});
     fetch('/api/sheets?type=leagues').then(r => r.json()).then(setAllLeagues).catch(() => {});
+    fetch('/api/sheets?type=accounts').then(r => r.json()).then(setAccounts).catch(() => {});
   }, [teamName]);
 
   // Close switcher when clicking outside
@@ -35,6 +42,10 @@ export default function AdminTeamDetailPage() {
         setShowSwitcher(false);
         setSwitcherSearch('');
       }
+      if (captainRef.current && !captainRef.current.contains(e.target)) {
+        setShowCaptainPicker(false);
+        setCaptainSearch('');
+      }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -43,6 +54,26 @@ export default function AdminTeamDetailPage() {
   const filteredTeams = allTeams.filter(t =>
     t.name?.toLowerCase().includes(switcherSearch.toLowerCase())
   );
+
+  const filteredAccounts = accounts.filter(a => {
+    const name = a.accountName || a.name || '';
+    return name.toLowerCase().includes(captainSearch.toLowerCase());
+  });
+
+  const handleSelectCaptain = async (account) => {
+    const name = account.accountName || account.name || '';
+    const phone = account.phoneNumber || '';
+    setShowCaptainPicker(false);
+    setCaptainSearch('');
+    setTeam(prev => ({ ...prev, captain: name, captainPhone: phone }));
+    setCaptainSaving(true);
+    await fetch('/api/sheets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'updateTeam', data: { teamName, updates: { 'Captains': name, "Captains' #": phone } } }),
+    });
+    setCaptainSaving(false);
+  };
 
   const handleSwitchTeam = (name) => {
     setShowSwitcher(false);
@@ -145,16 +176,97 @@ export default function AdminTeamDetailPage() {
           )}
         </div>
 
-        {/* Captain info */}
-        <div style={{ background: '#fff', borderRadius: 16, padding: '16px 20px', marginBottom: 20, display: 'flex', gap: 16, fontFamily }}>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#000', marginBottom: 6 }}>CAPTAIN</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#000' }}>CAPTAIN #</div>
+        {/* Captain info — click captain box to change */}
+        <div ref={captainRef} style={{ position: 'relative', marginBottom: 20 }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: '16px 20px', display: 'flex', gap: 16, fontFamily }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#000', marginBottom: 6 }}>CAPTAIN</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#000' }}>CAPTAIN #</div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div
+                onClick={() => { setShowCaptainPicker(prev => !prev); setCaptainSearch(''); }}
+                style={{ background: '#000', color: '#fff', padding: '4px 10px', marginBottom: 4, borderRadius: 4, fontSize: 13, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                <span>{captainSaving ? 'SAVING...' : (team?.captain || '-')}</span>
+                <span style={{ fontSize: 10, opacity: 0.6 }}>▼</span>
+              </div>
+              <div style={{ background: '#000', color: '#fff', padding: '4px 10px', borderRadius: 4, fontSize: 13 }}>
+                {team?.captainPhone || '-'}
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ background: '#000', color: '#fff', padding: '4px 10px', marginBottom: 4, borderRadius: 4, fontSize: 13 }}>{team?.captain || '-'}</div>
-            <div style={{ background: '#000', color: '#fff', padding: '4px 10px', borderRadius: 4, fontSize: 13 }}>{team?.captainPhone || '-'}</div>
-          </div>
+
+          {showCaptainPicker && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              background: '#fff',
+              borderRadius: 12,
+              marginTop: 4,
+              zIndex: 100,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+              overflow: 'hidden',
+            }}>
+              <div style={{ padding: '10px 12px', borderBottom: '1px solid #eee' }}>
+                <input
+                  autoFocus
+                  value={captainSearch}
+                  onChange={e => setCaptainSearch(e.target.value)}
+                  placeholder="SEARCH ACCOUNTS..."
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    border: '1px solid #ddd',
+                    fontFamily,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              <div style={{ maxHeight: 240, overflowY: 'auto' }}>
+                {filteredAccounts.map(account => {
+                  const name = account.accountName || account.name || '';
+                  return (
+                    <div
+                      key={account.login}
+                      onMouseDown={() => handleSelectCaptain(account)}
+                      style={{
+                        padding: '12px 16px',
+                        cursor: 'pointer',
+                        fontFamily,
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: '#000',
+                        textTransform: 'uppercase',
+                        borderBottom: '1px solid #eee',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        background: name === team?.captain ? '#f0f0f0' : '#fff',
+                      }}
+                    >
+                      <span>{name}</span>
+                      {account.phoneNumber && (
+                        <span style={{ fontSize: 11, color: '#888', fontWeight: 400 }}>{account.phoneNumber}</span>
+                      )}
+                    </div>
+                  );
+                })}
+                {filteredAccounts.length === 0 && (
+                  <div style={{ padding: '16px', color: '#888', fontFamily, fontSize: 13, textAlign: 'center' }}>
+                    NO ACCOUNTS FOUND
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Add to league */}

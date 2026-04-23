@@ -10,9 +10,14 @@ function PaymentSuccessContent() {
   const team = searchParams.get('team');
 
   useEffect(() => {
-    // In production, update the Paid column in Google Sheets here
-    // via a server action or API call
-  }, []);
+    if (league && team) {
+      fetch('/api/sheets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'updateLeaguePaid', data: { leagueName: league, teamName: team } }),
+      }).catch(() => {});
+    }
+  }, [league, team]);
 
   return (
     <PageLayout>

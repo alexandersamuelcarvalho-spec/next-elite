@@ -63,13 +63,16 @@ export default function CaptainTeamPage() {
           <p style={{ color: '#888', textAlign: 'center', fontFamily: 'Copperplate, serif', marginTop: 20 }}>NO LEAGUES</p>
         )}
 
-        {/* TABLE and SCHEDULE buttons */}
+        {/* TABLE, SCHEDULE, PAYMENT buttons */}
         <div style={{ marginTop: 16 }}>
           <button onClick={() => router.push(`/captain/table/${encodeURIComponent(team?.leagues?.[0] || teamName)}`)} style={{ width: '100%', padding: '18px', fontSize: '18px', borderRadius: 999, background: '#fff', color: '#000', border: '2px solid #fff', fontFamily: 'Copperplate, "Copperplate Gothic Light", Cinzel, serif', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', marginBottom: 14 }}>
             TABLE
           </button>
           <button onClick={() => router.push(`/schedule/${encodeURIComponent(team?.leagues?.[0] || teamName)}`)} style={{ width: '100%', padding: '18px', fontSize: '18px', borderRadius: 999, background: '#fff', color: '#000', border: '2px solid #fff', fontFamily: 'Copperplate, "Copperplate Gothic Light", Cinzel, serif', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', marginBottom: 14 }}>
             SCHEDULE
+          </button>
+          <button onClick={() => router.push(`/captain/payments?team=${encodeURIComponent(teamName)}`)} style={{ width: '100%', padding: '18px', fontSize: '18px', borderRadius: 999, background: '#fff', color: '#000', border: '2px solid #fff', fontFamily: 'Copperplate, "Copperplate Gothic Light", Cinzel, serif', fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer', marginBottom: 14 }}>
+            PAYMENT
           </button>
         </div>
       </div>

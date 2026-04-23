@@ -80,6 +80,8 @@ export async function POST(request) {
       await sheets.updateTeam(body.data.teamName, body.data.updates);
     } else if (action === 'updateAccountPhone') {
       await sheets.updateAccountPhone(body.data.login, body.data.phone);
+    } else if (action === 'updateLeaguePaid') {
+      await sheets.updateLeaguePaid(body.data.leagueName, body.data.teamName);
     }
 
     return NextResponse.json({ success: true });

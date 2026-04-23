@@ -1,11 +1,18 @@
 'use client';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useApp } from '../../context/AppContext';
 import PageLayout from '../../components/PageLayout';
 
 export default function HomePage() {
   const router = useRouter();
   const { t, userRole } = useApp();
+  const { data: session } = useSession();
+
+  // On live site use real session status; fall back to context role for dev
+  const effectiveRole = session?.user?.status?.toLowerCase() === 'admin'
+    ? 'admin'
+    : userRole;
 
   const BtnStyle = {
     width: '100%',
@@ -27,7 +34,7 @@ export default function HomePage() {
   const handleNav = (path) => router.push(path);
 
   // Determine which home to show based on role
-  if (userRole === 'admin') {
+  if (effectiveRole === 'admin') {
     return (
       <PageLayout>
         <div style={{ paddingTop: 16 }}>
@@ -50,7 +57,7 @@ export default function HomePage() {
     );
   }
 
-  if (userRole === 'captain') {
+  if (effectiveRole === 'captain') {
     return (
       <PageLayout>
         <div style={{ paddingTop: 16 }}>
@@ -72,7 +79,7 @@ export default function HomePage() {
     );
   }
 
-  if (userRole === 'player') {
+  if (effectiveRole === 'player') {
     return (
       <PageLayout>
         <div style={{ paddingTop: 16 }}>

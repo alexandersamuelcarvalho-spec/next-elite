@@ -1,24 +1,38 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import { useSession } from 'next-auth/react';
 import { useApp } from '../context/AppContext';
 
 export default function PageLayout({ children, showHeader = true }) {
   const router = useRouter();
-  const { t } = useApp();
+  const { t, userRole } = useApp();
+  const { data: session, status } = useSession();
 
   const handleBack = () => {
     router.back();
   };
 
   const handleAccount = () => {
-    // Navigate to account home based on role
-    router.push('/home');
+    if (status === 'authenticated') {
+      const accountStatus = session?.user?.status?.toLowerCase();
+      if (accountStatus === 'admin') {
+        router.push('/account/admin-selection');
+      } else {
+        router.push('/account');
+      }
+      return;
+    }
+    // Dev / unauthenticated fallback using context role
+    if (userRole === 'admin') {
+      router.push('/account/admin-selection');
+    } else if (userRole) {
+      router.push('/account');
+    } else {
+      router.push('/login');
+    }
   };
 
-  const handleLogo = () => {
-    router.push('/home');
-  };
+  const handleLogo = () => router.push('/home');
 
   return (
     <div className="page-container">

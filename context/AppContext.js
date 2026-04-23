@@ -1,5 +1,6 @@
 'use client';
 import { createContext, useContext, useState, useEffect } from 'react';
+import { SessionProvider } from 'next-auth/react';
 
 const AppContext = createContext(null);
 
@@ -120,19 +121,21 @@ export function AppProvider({ children }) {
   const switchLanguage = (lang) => setLanguage(lang);
 
   return (
-    <AppContext.Provider value={{
-      language,
-      switchLanguage,
-      t,
-      userRole,
-      setUserRole,
-      userAccount,
-      setUserAccount,
-      historyStack,
-      setHistoryStack,
-    }}>
-      {children}
-    </AppContext.Provider>
+    <SessionProvider>
+      <AppContext.Provider value={{
+        language,
+        switchLanguage,
+        t,
+        userRole,
+        setUserRole,
+        userAccount,
+        setUserAccount,
+        historyStack,
+        setHistoryStack,
+      }}>
+        {children}
+      </AppContext.Provider>
+    </SessionProvider>
   );
 }
 

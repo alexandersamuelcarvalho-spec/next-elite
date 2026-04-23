@@ -49,7 +49,7 @@ export async function POST(request) {
     const { action } = body;
 
     if (!process.env.GOOGLE_SHEETS_ID) {
-      return NextResponse.json({ success: true, message: 'Mock mode - no actual changes' });
+      return NextResponse.json({ success: true, message: 'Mock mode - no actual changes made' });
     }
 
     const sheets = await import('../../../lib/sheets');
@@ -78,6 +78,8 @@ export async function POST(request) {
       await sheets.setBracketWinner(body.data.leagueName, body.data.box, body.data.winner, body.data.isChampion);
     } else if (action === 'updateTeam') {
       await sheets.updateTeam(body.data.teamName, body.data.updates);
+    } else if (action === 'updateAccountPhone') {
+      await sheets.updateAccountPhone(body.data.login, body.data.phone);
     }
 
     return NextResponse.json({ success: true });

@@ -111,6 +111,7 @@ export default function HomePage() {
         <button style={BtnStyle} onClick={() => handleNav('/login')}>
           {t('logIn')}
         </button>
+
       </div>
     </PageLayout>
   );

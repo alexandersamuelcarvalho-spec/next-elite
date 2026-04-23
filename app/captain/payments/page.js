@@ -9,34 +9,39 @@ const fontFamily = 'Copperplate, "Copperplate Gothic Light", Cinzel, serif';
 function PaymentsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const focusTeam = searchParams.get('team'); // optional: scroll to a specific team
+  const focusTeam = searchParams.get('team');
   const { data: session } = useSession();
 
-  const [allTeams, setAllTeams] = useState([]);
+  const [myTeams, setMyTeams] = useState([]);
   const [leagues, setLeagues] = useState([]);
-  // paidStatus: { [leagueName]: { [teamName]: boolean } }
   const [paidStatus, setPaidStatus] = useState({});
-  const [paying, setPaying] = useState(null); // 'teamName|leagueName'
+  const [paying, setPaying] = useState(null);
 
+  // Load teams filtered to what this captain owns
   useEffect(() => {
-    fetch('/api/sheets?type=teams').then(r => r.json()).then(setAllTeams).catch(() => {});
-    fetch('/api/sheets?type=leagues').then(r => r.json()).then(setLeagues).catch(() => {});
-  }, []);
+    if (!session) return;
+    const captainTeamNames = Array.isArray(session?.user?.teams)
+      ? session.user.teams.filter(t => t.role?.toLowerCase() === 'captain').map(t => t.team)
+      : [];
+    fetch('/api/sheets?type=teams')
+      .then(r => r.json())
+      .then(all => setMyTeams(Array.isArray(all) ? all.filter(t => captainTeamNames.includes(t.name)) : []))
+      .catch(() => {});
+    fetch('/api/sheets?type=leagues')
+      .then(r => r.json())
+      .then(all => setLeagues(Array.isArray(all) ? all : []))
+      .catch(() => {});
+  }, [session]);
 
-  // Get only teams this account is captain of
-  const captainTeamNames = (session?.user?.teams || [])
-    .filter(t => t.role?.toLowerCase() === 'captain')
-    .map(t => t.team);
-  const myTeams = allTeams.filter(t => captainTeamNames.includes(t.name));
-
-  // Fetch paid status for each league that any of my teams are in
+  // Fetch paid status once myTeams is loaded
   useEffect(() => {
     if (myTeams.length === 0) return;
-    const leagueNames = [...new Set(myTeams.flatMap(t => t.leagues || []))];
+    const leagueNames = [...new Set(myTeams.flatMap(t => Array.isArray(t.leagues) ? t.leagues : []))];
     leagueNames.forEach(leagueName => {
       fetch(`/api/sheets?type=table&league=${encodeURIComponent(leagueName)}`)
         .then(r => r.json())
         .then(table => {
+          if (!Array.isArray(table)) return;
           setPaidStatus(prev => ({
             ...prev,
             [leagueName]: Object.fromEntries(table.map(row => [row.team, row.paid === 'Paid'])),
@@ -44,7 +49,7 @@ function PaymentsContent() {
         })
         .catch(() => {});
     });
-  }, [myTeams.length]);
+  }, [myTeams]);
 
   const handlePay = async (teamName, leagueName, price) => {
     const key = `${teamName}|${leagueName}`;
@@ -63,7 +68,6 @@ function PaymentsContent() {
     }
   };
 
-  // If focusTeam is set, show that team first
   const sortedTeams = focusTeam
     ? [...myTeams].sort((a, b) => (a.name === focusTeam ? -1 : b.name === focusTeam ? 1 : 0))
     : myTeams;
